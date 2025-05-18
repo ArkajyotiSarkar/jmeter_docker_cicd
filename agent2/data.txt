@@ -1,0 +1,3 @@
+fromPort,toPort,flight,price,airline
+Portland,New York,9696,200.98,Aer Lingus
+San Diego,Berlin,4346,233.98,Lufthansa
