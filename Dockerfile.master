@@ -1,0 +1,45 @@
+FROM openjdk:11-jre-slim
+
+LABEL maintainer="you@example.com"
+
+# Install curl and unzip
+RUN apt-get update && apt-get install -y bash curl unzip && rm -rf /var/lib/apt/lists/*
+
+# Set JMeter version
+ENV JMETER_VERSION=5.6.3
+
+# Download and extract JMeter
+RUN curl -L https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz -o /tmp/jmeter.tgz && \
+    mkdir -p /jmeter/apache-jmeter-${JMETER_VERSION} && \
+    tar -xzf /tmp/jmeter.tgz -C /jmeter/apache-jmeter-${JMETER_VERSION} --strip-components=1 && \
+    rm /tmp/jmeter.tgz
+
+# Download Plugins Manager
+RUN curl -L https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.8/jmeter-plugins-manager-1.8.jar \
+    -o /jmeter/apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar
+
+# Install Plugins Manager CLI dependencies
+RUN curl -L https://repo1.maven.org/maven2/kg/apc/cmdrunner/2.2/cmdrunner-2.2.jar \
+    -o /jmeter/apache-jmeter-${JMETER_VERSION}/lib/cmdrunner-2.2.jar
+
+# Install desired plugins (Ultimate Thread Group, etc.)
+RUN java -cp /jmeter/apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar \
+    org.jmeterplugins.repository.PluginManagerCMDInstaller && \
+    /jmeter/apache-jmeter-${JMETER_VERSION}/bin/PluginsManagerCMD.sh install jpgc-utg,jpgc-casutg,jpgc-graphs-basic
+
+
+# Set working directory
+WORKDIR /test
+
+# Copy test plan and script
+COPY BlazeDemoFlight_removed.jmx /test/BlazeDemoFlight_removed.jmx
+COPY StartJmeter.sh /test/StartJmeter.sh
+
+# Make the script executable
+RUN chmod +x /test/StartJmeter.sh
+
+# Set default environment variable
+ENV REPORT_FOLDER=report_default
+
+# Set entrypoint to shell script
+ENTRYPOINT ["/test/StartJmeter.sh"]

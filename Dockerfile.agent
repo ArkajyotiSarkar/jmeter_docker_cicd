@@ -1,0 +1,33 @@
+FROM openjdk:11-jre-slim
+
+LABEL maintainer="you@example.com"
+
+RUN apt-get update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
+
+ENV JMETER_VERSION=5.6.3
+
+RUN curl -L https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz -o /tmp/jmeter.tgz && \
+    mkdir -p /jmeter/apache-jmeter-${JMETER_VERSION} && \
+    tar -xzf /tmp/jmeter.tgz -C /jmeter/apache-jmeter-${JMETER_VERSION} --strip-components=1 && \
+    rm /tmp/jmeter.tgz
+
+# Download Plugins Manager
+RUN curl -L https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.8/jmeter-plugins-manager-1.8.jar \
+    -o /jmeter/apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar
+
+# Install Plugins Manager CLI dependencies
+RUN curl -L https://repo1.maven.org/maven2/kg/apc/cmdrunner/2.2/cmdrunner-2.2.jar \
+    -o /jmeter/apache-jmeter-${JMETER_VERSION}/lib/cmdrunner-2.2.jar
+
+# Install desired plugins (Ultimate Thread Group, etc.)
+RUN java -cp /jmeter/apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar \
+    org.jmeterplugins.repository.PluginManagerCMDInstaller && \
+    /jmeter/apache-jmeter-${JMETER_VERSION}/bin/PluginsManagerCMD.sh install jpgc-utg,jpgc-casutg,jpgc-graphs-basic
+
+
+ENV JMETER_HOME=/jmeter/apache-jmeter-${JMETER_VERSION}
+ENV PATH=$JMETER_HOME/bin:$PATH
+
+WORKDIR /jmeter/apache-jmeter-${JMETER_VERSION}
+
+ENTRYPOINT ["jmeter-server", "-Dserver.rmi.ssl.disable=true", "-Djavax.net.ssl.keyStore=", "-Djavax.net.ssl.keyStorePassword="]

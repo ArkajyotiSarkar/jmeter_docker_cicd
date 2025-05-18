@@ -1,0 +1,48 @@
+services:
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile.master
+    container_name: jmeter-master
+    depends_on:
+      - agent1
+      - agent2
+    volumes:
+      - ./BlazeDemoFlight_removed.jmx:/test/BlazeDemoFlight_removed.jmx
+      - ./StartJmeter.sh:/test/StartJmeter.sh
+      - ./results:/test  # Mount results directory directly
+    environment:
+      - REPORT_FOLDER=${REPORT_FOLDER}
+    entrypoint: ["/bin/sh", "/test/StartJmeter.sh"]
+    networks:
+      jmeter-net:
+        aliases:
+          - master
+
+  agent1:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: jmeter-agent1
+    volumes:
+      - ./agent1/data.txt:/data/data.txt
+    networks:
+      jmeter-net:
+        aliases:
+          - jmeter-agent1
+
+  agent2:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: jmeter-agent2
+    volumes:
+      - ./agent2/data.txt:/data/data.txt
+    networks:
+      jmeter-net:
+        aliases:
+          - jmeter-agent2
+
+networks:
+  jmeter-net:
+    driver: bridge
