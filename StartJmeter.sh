@@ -14,16 +14,16 @@ if [ -d "/test/${REPORT_FOLDER}" ]; then
 fi
 
 # 📂 Create a fresh report directory
-mkdir -p "/test/${REPORT_FOLDER}"
+mkdir -p "/test/results/${REPORT_FOLDER}"
 
 echo "Starting JMeter test..."
 
 # 🚀 Run JMeter in non-GUI mode with distributed execution
 /jmeter/apache-jmeter-${JMETER_VERSION}/bin/jmeter $JVM_ARGS -n \
   -t "/test/BlazeDemoFlight_removed.jmx" \
-  -l "${REPORT_FOLDER}/results.jtl" \
-  -j "${REPORT_FOLDER}/jmeter.log" \
-  -e -o "${REPORT_FOLDER}/html" \
+  -l "/test/results/${REPORT_FOLDER}/results.jtl" \
+  -j "/test/results/${REPORT_FOLDER}/jmeter.log" \
+  -e -o "/test/results/${REPORT_FOLDER}/html" \
   -R jmeter-agent1,jmeter-agent2
 
 echo "JMeter test execution completed."
