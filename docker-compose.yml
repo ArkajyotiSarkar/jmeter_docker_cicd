@@ -1,7 +1,7 @@
 services:
   master:
     build:
-      context: ./src
+      context: .
       dockerfile: Dockerfile.master
     container_name: jmeter-master
     depends_on:
@@ -10,7 +10,7 @@ services:
     volumes:
       - ./BlazeDemoFlight_removed.jmx:/test/BlazeDemoFlight_removed.jmx
       - ./StartJmeter.sh:/test/StartJmeter.sh
-      - ./results:/test/results  # Mount results directory directly
+      - ../results:/test/results  # Mount results directory directly
     environment:
       - REPORT_FOLDER=${REPORT_FOLDER}
     entrypoint: ["/bin/sh", "/test/StartJmeter.sh"]
@@ -21,7 +21,7 @@ services:
 
   agent1:
     build:
-      context: ./src
+      context: .
       dockerfile: Dockerfile.agent
     container_name: jmeter-agent1
     volumes:
@@ -33,7 +33,7 @@ services:
 
   agent2:
     build:
-      context: ./src
+      context: .
       dockerfile: Dockerfile.agent
     container_name: jmeter-agent2
     volumes:
