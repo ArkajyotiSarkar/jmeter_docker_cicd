@@ -16,8 +16,8 @@ RUN curl -L https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.8/jme
     -o /jmeter/apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar
 
 # Install Plugins Manager CLI dependencies
-RUN curl -L https://repo1.maven.org/maven2/kg/apc/cmdrunner/2.2/cmdrunner-2.2.jar \
-    -o /jmeter/apache-jmeter-${JMETER_VERSION}/lib/cmdrunner-2.2.jar
+RUN curl -L https://repo1.maven.org/maven2/kg/apc/cmdrunner/2.3/cmdrunner-2.3.jar \
+    -o /jmeter/apache-jmeter-${JMETER_VERSION}/lib/cmdrunner-2.3.jar
 
 # Install desired plugins (Ultimate Thread Group, etc.)
 RUN java -cp /jmeter/apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar \
