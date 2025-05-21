@@ -34,6 +34,8 @@ WORKDIR /test
 # Copy test plan and script
 COPY BlazeDemoFlight_removed.jmx /test/BlazeDemoFlight_removed.jmx
 COPY StartJmeter.sh /test/StartJmeter.sh
+RUN apt-get update && apt-get install -y dos2unix && \
+    dos2unix /test/StartJmeter.sh
 
 # Make the script executable
 RUN chmod +x /test/StartJmeter.sh
