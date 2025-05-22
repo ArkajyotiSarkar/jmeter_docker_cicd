@@ -9,7 +9,7 @@ services:
       - agent2
     volumes:
       - ./BlazeDemoFlight_removed.jmx:/test/BlazeDemoFlight_removed.jmx
-      - ./StartJmeter.sh:/test/StartJmeter.sh
+      #- ./StartJmeter.sh:/test/StartJmeter.sh
       - ../results:/test/results  # Mount results directory directly
     environment:
       - REPORT_FOLDER=${REPORT_FOLDER}
