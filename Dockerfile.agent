@@ -22,7 +22,7 @@ RUN curl -L https://repo1.maven.org/maven2/kg/apc/cmdrunner/2.3/cmdrunner-2.3.ja
 # Install desired plugins (Ultimate Thread Group, etc.)
 RUN java -cp /jmeter/apache-jmeter-${JMETER_VERSION}/lib/ext/jmeter-plugins-manager.jar \
     org.jmeterplugins.repository.PluginManagerCMDInstaller && \
-    /jmeter/apache-jmeter-${JMETER_VERSION}/bin/PluginsManagerCMD.sh install jpgc-cmd,jpgc-casutg,jpgc-graphs-basic
+    /jmeter/apache-jmeter-${JMETER_VERSION}/bin/PluginsManagerCMD.sh install jpgc-utg,jpgc-casutg,jpgc-graphs-basic
 
 
 ENV JMETER_HOME=/jmeter/apache-jmeter-${JMETER_VERSION}
