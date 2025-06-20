@@ -1,0 +1,86 @@
+pipeline {
+    agent any
+
+ environment {
+    DOCKER_COMPOSE_PATH = 'D:/jmeter-git-plugin/src'
+    REPORT_FOLDER = "report_${new Date().format('MMM_dd_yyyy')}_session${BUILD_NUMBER}"
+}
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        
+        stage('Clean src folder') {
+             steps {
+                    bat 'rmdir /s /q D:\\jmeter-git-plugin\\src 2>nul || echo src not found'
+                    }
+                }
+        
+        
+        
+          stage('Clone JMeter Test Files from GitHub') {
+            steps {
+              dir("${DOCKER_COMPOSE_PATH}") {
+                    // ✅ Clone test plan (.jmx) and data files from GitHub
+                     bat 'git clone --depth 1 https://github.com/ArkajyotiSarkar/jmeter_docker_cicd.git .'
+                    
+                    // 🔍 Optional: Validate files exist
+                   // bat 'dir BlazeDemoFlight_removed.jmx'
+                }
+            }
+        }
+        stage('Clean Docker Containers') {
+            steps {
+                dir("${DOCKER_COMPOSE_PATH}") {
+                    bat 'docker-compose down --volumes --remove-orphans'
+                }
+            }
+        }
+
+        stage('Build Docker Images (no cache)') {
+            steps {
+                dir("${DOCKER_COMPOSE_PATH}") {
+                    bat 'docker-compose build --no-cache'
+                }
+            }
+        }
+
+        stage('Start Docker Containers') {
+            steps {
+                dir("${DOCKER_COMPOSE_PATH}") {
+                    bat "set REPORT_FOLDER=${REPORT_FOLDER} && docker-compose up -d --force-recreate"
+
+                    // ✅ OPTIONAL DEBUG: Ensure script is present inside the master container
+                    //bat 'docker exec jmeter-master dir /test || echo Could not list contents of /test'
+                }
+            }
+        }
+
+        stage('Run JMeter Test and Wait') {
+            steps {
+                dir("${DOCKER_COMPOSE_PATH}") {
+                    
+                    echo "==== Viewing running containers ===="
+                    bat "docker ps -a"
+
+                    echo "==== Printing logs from jmeter-master ===="
+                    bat 'docker-compose logs -f master'
+
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up Docker and system cache...'
+            dir("${env.DOCKER_COMPOSE_PATH}/src") {
+                bat 'docker-compose down --volumes --remove-orphans'
+            }
+            bat 'docker system prune -a -f --volumes'
+        }
+    }
+}
